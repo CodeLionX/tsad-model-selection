@@ -53,7 +53,7 @@ def evaluate_model_wrapper(dataset, entity, args):
     rank_model_params['downsampling'] = args['downsampling']
     logging_hierarchy = [dataset]
 
-    if not args['downsampling']:
+    if not args['overwrite']:
         if logging_obj.check_file_exists(obj_class=logging_hierarchy,
                                          obj_name=f'ranking_obj_{entity}'):
             print(f'Models on entity {entity} already evaluated!')
