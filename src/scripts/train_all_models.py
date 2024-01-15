@@ -15,12 +15,14 @@ from tsadams.model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 from tsadams.utils.utils import get_args_from_cmdline
 from tsadams.utils.set_all_seeds import set_all_seeds
 
-def train_model_wrapper(dataset, entities, args):
+
+def train_model_wrapper(dataset, entity, args):
+    print()
     print(42 * "=")
-    print(f"Training models on entity: {entities}")
+    print(f"Training models on entity: {entity}")
     print(42 * "=")
     model_trainer = TrainModels(dataset=dataset,
-                                entity=entities,
+                                entity=entity,
                                 downsampling=args['downsampling'],
                                 min_length=args['min_length'],
                                 root_dir=args['dataset_path'],
@@ -31,21 +33,20 @@ def train_model_wrapper(dataset, entities, args):
     try:
         model_trainer.train_models(model_architectures=args['model_architectures'])
     except:  # Handle exceptions to allow continue training
-        print(f'Traceback for Entity: {entities} Dataset: {dataset}')
+        print(f'Traceback for Entity: {entity} Dataset: {dataset}')
         print(traceback.format_exc())
     print(42 * "=")
 
-def main():
+
+def main(datasets=['anomaly_archive', 'smd'], entities=[ANOMALY_ARCHIVE_ENTITIES, MACHINES]):
     args = get_args_from_cmdline()
    
     print('Set all seeds!')
     set_all_seeds(args['random_seed']) # Reduce randomness
-    
-    DATASETS = ['anomaly_archive', 'smd']
-    ENTITIES = [ANOMALY_ARCHIVE_ENTITIES, MACHINES]
 
-    for d_i, dataset in enumerate(DATASETS):
-        _ = Parallel(n_jobs=args['n_jobs'])(delayed(train_model_wrapper)(dataset, entities, args) for entities in ENTITIES[d_i])
+    for d_i, dataset in enumerate(datasets):
+        _ = Parallel(n_jobs=args['n_jobs'])(delayed(train_model_wrapper)(dataset, entity, args) for entity in entities[d_i])
+
 
 if __name__ == '__main__':
     main()    

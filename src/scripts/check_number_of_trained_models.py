@@ -10,21 +10,26 @@
 
 import os
 from tsadams.utils.utils import get_args_from_cmdline
-from tsadams.model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
+from tsadams.model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES, AUTOTSAD_ENTITIES
 
-DATASETS = ['anomaly_archive', 'smd']
-ENTITIES = [ANOMALY_ARCHIVE_ENTITIES, MACHINES]
 
-def main():
+# DATASETS = ['anomaly_archive', 'smd']
+# ENTITIES = [ANOMALY_ARCHIVE_ENTITIES, MACHINES]
+DATASETS = ['autotsad']
+ENTITIES = [AUTOTSAD_ENTITIES]
+ENTITIES = [['GutenTAG=ecg-diff-count-1.semi-supervised']]
+
+
+def main(datasets=DATASETS, entities=ENTITIES):
     args = get_args_from_cmdline()
 
     total_models = 0
-    for d, dataset in enumerate(DATASETS):
+    for d, dataset in enumerate(datasets):
         total_models_per_dataset = 0
         if not os.path.exists(os.path.join(args['trained_model_path'], dataset)):
             print(f'No models trained for dataset {dataset}')
         else:
-            for entity in ENTITIES[d]:
+            for entity in entities[d]:
                 if not os.path.exists(
                         os.path.join(args['trained_model_path'], dataset,
                                      entity)):
@@ -47,6 +52,7 @@ def main():
             f'Total models trained in {dataset} dataset: {dataset} = {total_models_per_dataset}'
         )
     print(f'Total number of models trained = {total_models}')
+
 
 if __name__ == '__main__':
     main()

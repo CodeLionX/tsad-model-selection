@@ -74,20 +74,15 @@ def evaluate_model_wrapper(dataset, entity, args):
                      obj_class=logging_hierarchy,
                      type='data')
 
-def main():
+def main(datasets=['smd', 'anomaly_archive'], entities=[ANOMALY_ARCHIVE_ENTITIES, MACHINES]):
     args = get_args_from_cmdline()
     
     set_all_seeds(args['random_seed']) # Reduce randomness
-    
-    # DATASETS = ['smd', 'anomaly_archive']
-    # ENTITIES = [MACHINES, ANOMALY_ARCHIVE_ENTITIES]
-    DATASETS = ['anomaly_archive']
-    ENTITIES = [ANOMALY_ARCHIVE_ENTITIES[::-1]]
 
-    for d_i, dataset in enumerate(DATASETS):
+    for d_i, dataset in enumerate(datasets):
         _ = Parallel(n_jobs=args['n_jobs'])(
             delayed(evaluate_model_wrapper)(dataset, entities, args)
-            for entities in ENTITIES[d_i])
+            for entities in entities[d_i])
 
 if __name__ == '__main__':
     main()    
