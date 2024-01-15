@@ -153,10 +153,10 @@ def evaluate_model(data: Union[Dataset, Entity],
     )  # return_detail = False averages the anomaly scores across features.
     entity_scores = entity_scores.detach().cpu().numpy()
 
-    Y_hat = de_unfold(windows=Y_hat, window_step=model.window_step)
-    Y = de_unfold(windows=Y, window_step=model.window_step)
-    Y_sigma = de_unfold(windows=Y_sigma, window_step=model.window_step)
-    mask = de_unfold(windows=mask, window_step=model.window_step)
+    Y_hat = de_unfold(windows=Y_hat, window_step=model.window_step, use_numpy=True)
+    Y = de_unfold(windows=Y, window_step=model.window_step, use_numpy=True)
+    Y_sigma = de_unfold(windows=Y_sigma, window_step=model.window_step, use_numpy=True)
+    mask = de_unfold(windows=mask, window_step=model.window_step, use_numpy=True)
 
     # Remove extra padding from Anomaly Scores and forecasts
     entity_scores = _adjust_scores_with_padding(
@@ -257,7 +257,7 @@ def evaluate_model_synthetic_anomalies(data: Union[Dataset, Entity],
         anomaly_sizes_concatenated = []
         anomaly_labels_concatenated = []
 
-        for i in trange(n_repeats):
+        for i in trange(n_repeats, desc=f"Eval {model_name} on synthetic for {anomaly_type}", unit="reps"):
             # Create an anomaly object for each random seed for each unique repetition
             anomaly_obj = InjectAnomalies(random_state=random_states[i],
                                           verbose=False,

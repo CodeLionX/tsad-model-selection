@@ -28,11 +28,12 @@ def get_args_from_cmdline():
     
     return args
 
-def de_unfold(windows, window_step):
+def de_unfold(windows, window_step, use_numpy=False):
     """
     windows of shape (n_windows, n_channels, window_size)
     """
     n_windows, n_channels, window_size = windows.shape
+    factory = np if use_numpy else t
 
     if window_step < 0:
         window_step = window_size
@@ -41,8 +42,8 @@ def de_unfold(windows, window_step):
 
     total_len = (n_windows)*window_step + (window_size-window_step)
 
-    x = t.zeros((n_channels, total_len))
-    counter = t.zeros((1, total_len))
+    x = factory.zeros((n_channels, total_len))
+    counter = factory.zeros((1, total_len))
 
     for i in range(n_windows):
         start = i*window_step
