@@ -42,7 +42,6 @@ def set_eval_params(args):
 
 
 def evaluate_model_wrapper(dataset, entity, args):
-    unevaluated_entities = []  # List of entities which remain unevaluated
     evaluate_model_params, logging_obj, rank_model_params = set_eval_params(args)
 
     print(42 * "=")
@@ -65,8 +64,8 @@ def evaluate_model_wrapper(dataset, entity, args):
 
     try: 
         _ = ranking_obj.evaluate_models(**evaluate_model_params)
-    except:
-        print(f'Error in evaluating models on entity: {entity}')
+    except Exception as e:
+        print(f'Error in evaluating models on entity: {entity}: {e}')
 
     # Save the ranking objection for later use
     logging_obj.save(obj=ranking_obj,

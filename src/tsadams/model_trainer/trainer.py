@@ -144,7 +144,7 @@ class Trainer(object):
         else:
             n_train_epochs = int(np.ceil(self.args.max_steps/train_dataloader.n_batch_in_epochs))
 
-        progress_bar = tqdm.tqdm(total=n_train_epochs)
+        progress_bar = tqdm.tqdm(total=n_train_epochs, desc=f"Training {self.model.__class__.__name__} on {self.train_dataset.name}")
 
         # Training loop
         total_steps = 0
@@ -227,7 +227,7 @@ class Trainer(object):
                         if self.eval_dataset:
                             display_string += ", Eval: {:.5f}".format(eval_loss)
 
-                        print(display_string)
+                        progress_bar.write(display_string)
 
                     tr_loss, counter_loss = 0, 0
             

@@ -241,6 +241,8 @@ class TrainModels(object):
         model_hyper_param_configurations = list(ParameterGrid(RNN_PARAM_GRID))
         train_hyper_param_configurations = list(
             ParameterGrid(RNN_TRAIN_PARAM_GRID))
+        if self.verbose:
+            print(f"Training RNN with {len(model_hyper_param_configurations)*len(train_hyper_param_configurations)} configurations")
         for train_hyper_params in tqdm(train_hyper_param_configurations):
             for model_hyper_params in tqdm(model_hyper_param_configurations):
                 training_args = TrainingArguments(**train_hyper_params)

@@ -100,7 +100,7 @@ class RankModels(object):
         self.synthetic_predictions = {}
         _ = self.get_random_syn_anomaly_params()
 
-        for model_name in tqdm(self.MODEL_NAMES):
+        for model_name in tqdm(self.MODEL_NAMES, desc="Computing predictions"):
             with open(
                     os.path.join(self.TRAINED_MODELS_PATH,
                                  f'{model_name}.pth'), 'rb') as f:
@@ -108,7 +108,7 @@ class RankModels(object):
             model.eval()  # Set model in evaluation mode
 
             eval_batch_size = get_eval_batchsizes(model_name=model_name)
-            # print(f'Model Name: {model_name} | Evaluation batch size: {eval_batch_size}')
+            tqdm.write(f"Model Name: {model_name} | Evaluation batch size: {eval_batch_size}")
 
             self.predictions[model_name] = evaluate_model(
                 data=self.test_data if split == 'test' else self.train_data,
@@ -135,15 +135,16 @@ class RankModels(object):
         # self.models_f1 = rank_by_max_F1(self.predictions, n_splits=n_splits)
         # self.models_prauc_f1 = rank_by_prauc_f1(self.predictions, n_splits=n_splits)
         
-        self.models_evaluation_metrics = rank_by_metrics(self.predictions,n_splits=n_splits, sliding_window=sliding_window)
-        self.models_forecasting_metrics = rank_by_forecasting_metrics(
-            self.predictions)
-        self.models_centrality = rank_by_centrality(self.predictions,
-                                                    n_neighbors=n_neighbors)
-        self.models_synthetic_anomlies = rank_by_synthetic_anomlies(
-            self.synthetic_predictions,
-            criterion=synthetic_ranking_criterion,
-            n_splits=n_splits)
+        print("Ranking models...")
+        print("  ... by anomaly detection metrics ...")
+        self.models_evaluation_metrics = rank_by_metrics(self.predictions, n_splits=n_splits, sliding_window=sliding_window)
+        print("  ... by forecasting metrics ...")
+        self.models_forecasting_metrics = rank_by_forecasting_metrics(self.predictions)
+        print("  ... by centrality ...")
+        self.models_centrality = rank_by_centrality(self.predictions, n_neighbors=n_neighbors)
+        print("  ... by synthetic anomalies ...")
+        self.models_synthetic_anomlies = rank_by_synthetic_anomlies(self.synthetic_predictions, n_splits=n_splits)
+        print("...done.")
 
         self.models_performance_matrix = pd.concat([
             self.models_evaluation_metrics, self.models_forecasting_metrics,
