@@ -12,22 +12,18 @@ verbose: True
 training_size: 1
 model_architectures: 'all'
 
-# Model evaluation parametersq
+# Model evaluation parameters
 normalize: True
 results_path: '/zfsauton/project/public/Mononito/results/' # '/home/scratch/mgoswami/results/'
 n_repeats: 2
-n_neighbors: [4, 10, 16]
 split: 'test'
 synthetic_ranking_criterion: 'f1'
 n_splits: 100
 n_validation_splits: 5
 n_neighbors: [2, 4, 6]
-n_splits: 100
 evaluation_metric: 'Best F-1'
 sliding_window: !!null
 metric: 'influence'
 top_k: 3
 use_all_ranks: False
 top_kr: !!null
-
-
