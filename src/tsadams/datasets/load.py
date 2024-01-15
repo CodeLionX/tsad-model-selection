@@ -1,15 +1,12 @@
 import os
 import shutil
-import matplotlib.pyplot as plt
+import hashlib
 
 import numpy as np
 import pandas as pd
 
-import dataclasses
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Union
-
-from tqdm import tqdm
+from pathlib import Path
+from typing import List, Union
 
 from .dataset import Entity, Dataset
 from ..utils.data_utils import download_file
@@ -20,13 +17,14 @@ MACHINES = ['machine-1-1','machine-1-2','machine-1-3','machine-1-4','machine-1-5
             'machine-2-1', 'machine-2-2','machine-2-3','machine-2-4','machine-2-5','machine-2-6','machine-2-7','machine-2-8','machine-2-9', 
             'machine-3-1', 'machine-3-2', 'machine-3-3', 'machine-3-4','machine-3-5','machine-3-6','machine-3-7','machine-3-8', 'machine-3-9',
             'machine-3-10', 'machine-3-11']
+AUTOTSAD_SEP = "="
 
 # Data URIs
 SMD_URL = 'https://raw.githubusercontent.com/NetManAIOps/OmniAnomaly/master/ServerMachineDataset'
 NASA_DATA_URI = r'https://s3-us-west-2.amazonaws.com/telemanom/data.zip'
 NASA_LABELS_URI = r'https://raw.githubusercontent.com/khundman/telemanom/master/labeled_anomalies.csv'
 ANOMALY_ARCHIVE_URI = r'https://www.cs.ucr.edu/~eamonn/time_series_data_2018/UCR_TimeSeriesAnomalyDatasets2021.zip'
-VALID_DATASETS = ['msl', 'smap', 'smd', 'anomaly_archive', 'swat', 'synthetic']
+VALID_DATASETS = ['msl', 'smap', 'smd', 'anomaly_archive', 'swat', 'synthetic', 'autotsad']
 
 def load_data(dataset: str, group: str, entities: Union[str, List[str]], downsampling: float=None, min_length: float=None, root_dir:str='./data', normalize:bool=True, verbose:bool=True):
     """Function to load TS anomaly detection datasets.
@@ -59,6 +57,8 @@ def load_data(dataset: str, group: str, entities: Union[str, List[str]], downsam
         raise NotImplementedError()
     elif dataset == 'synthetic':
         raise NotImplementedError()
+    elif dataset == 'autotsad':
+        return load_autotsad(group=group, datasets=entities, downsampling=downsampling, root_dir=root_dir, normalize=normalize, verbose=verbose)
     else: 
         raise ValueError(f'Dataset must be one of {VALID_DATASETS}, but {dataset} was passed!')
 
@@ -355,5 +355,98 @@ def load_synthetic():
 def load_swat(**kwargs):
     pass
 
+def load_autotsad(group, datasets=None, downsampling=None, min_length=None, root_dir='./data', normalize=True, verbose=True):
+    datasets_path = Path(root_dir) / "autotsad"
+    if not datasets_path.exists():
+        raise ValueError(f"AutoTSAD dataset not available, please put the data in the folder '{datasets_path}'!")
 
+    df = pd.read_csv(datasets_path / "datasets.csv").set_index(["collection_name", "dataset_name"])
+    # only use semi-supervised datasets!
+    df = df[df["train_type"] == "semi-supervised"]
+    all_entities = [(c, d) for c, d in df.index.tolist()]
+    all_entities = sorted(all_entities)
+
+    if datasets is None: datasets = [f"{c}{AUTOTSAD_SEP}{d}" for c, d in all_entities]
+    if isinstance(datasets, str): datasets = [datasets]
+    if verbose: print(f'Number of datasets: {len(datasets)}')
+
+    entities = []
+    for entity in datasets:
+        collection, dataset = entity.split(AUTOTSAD_SEP)
+        if (collection, dataset) not in all_entities:
+            raise ValueError(f"{entity} is not part of the semi-supervised AutoTSAD dataset!")
+
+        test_filepath = datasets_path / df.loc[(collection, dataset), "test_path"]
+        train_filepath = datasets_path / df.loc[(collection, dataset), "train_path"]
+
+        # compute metadata
+        with test_filepath.open("rb") as fh:
+            hexhash = hashlib.md5(fh.read()).hexdigest()
+        meta_data = {'name': test_filepath.stem, 'hexhash': hexhash, 'type': group}
+        if verbose: 
+            print(f'Entity meta-data: {meta_data}')
+
+        if normalize:
+            Y_train = pd.read_csv(train_filepath).iloc[:, 1:-1].values
+            scaler = MinMaxScaler()
+            scaler.fit(Y_train)
+
+        if group == 'train':
+            if normalize: 
+                Y_train = scaler.transform(Y_train).T
+            else:
+                Y_train = pd.read_csv(train_filepath).iloc[:, 1:-1].values.T
+
+            # No downsampling if n_time < min_length
+            n_time = Y_train.shape[-1]
+            if (downsampling is not None) and (min_length is not None):
+                if (n_time//downsampling < min_length):
+                    downsampling = None
+
+            # Downsampling
+            if downsampling is not None:
+                n_features, n_t = Y_train.shape
+                right_padding = downsampling - n_t%downsampling
+
+                Y_train = np.pad(Y_train, ((0,0), (right_padding, 0) ))
+                Y_train = Y_train.reshape(n_features, Y_train.shape[-1]//downsampling, downsampling).max(axis=2)
+
+            entity = Entity(Y=Y_train.reshape((1, -1)), name=meta_data["hexhash"], verbose=verbose)
+
+        else:
+            df = pd.read_csv(test_filepath)
+            Y = df.iloc[:, 1:-1].values
+            labels = df.iloc[:, -1].values
+
+            if normalize:
+                Y = scaler.transform(Y).T
+            else:
+                Y = Y.T
+
+            # No downsampling if n_time < min_length
+            n_time = Y.shape[-1]
+            if (downsampling is not None) and (min_length is not None):
+                if (n_time//downsampling < min_length):
+                    downsampling = None
+
+            # Downsampling
+            if downsampling is not None:
+                n_features, n_t = Y.shape
+                right_padding = downsampling - n_t%downsampling
+
+                Y = np.pad(Y, ((0,0), (right_padding, 0) ))
+                labels = np.pad(labels, (right_padding, 0))
+
+                Y = Y.reshape(n_features, Y.shape[-1]//downsampling, downsampling).max(axis=2)
+                labels = labels.reshape(labels.shape[0]//downsampling, downsampling).max(axis=1)
+            
+            labels = labels[None, :]
+            entity = Entity(Y=Y.reshape((1, -1)), name=meta_data["hexhash"], labels=labels, verbose=verbose)
+        
+        entities.append(entity)
+
+    name = "autotsad-train" if group == "train" else "autotsad-test"
+    data = Dataset(entities=entities, name=name, verbose=verbose)
+
+    return data
 
