@@ -14,7 +14,7 @@ from sklearn.model_selection import KFold
 from typing import List, Optional, Union
 
 from ..model_trainer.entities import ANOMALY_ARCHIVE_ENTITY_TO_DATA_FAMILY
-from ..utils.eval_utils import _get_pooled_aggregate_stats_split, _get_pooled_reliability
+from ..utils.eval_utils import get_pooled_aggregate_stats_split, _get_pooled_reliability
 
 #######################################
 # Pooled Evaluation
@@ -38,7 +38,7 @@ def get_pooled_aggregate_stats(
 
     ranking_object_files = os.listdir(os.path.join(save_dir, dataset))
     evaluated_entities = [
-        '_'.join(i.split('_')[2:]).split('.')[0] for i in ranking_object_files
+        '.'.join('_'.join(i.split('_')[2:]).split('.')[:-1]) for i in ranking_object_files
     ]
     if dataset == 'anomaly_archive':
         evaluated_entities = [
@@ -52,7 +52,7 @@ def get_pooled_aggregate_stats(
                shuffle=True)
 
     aggregate_stats_temp = Parallel(n_jobs=n_jobs)(
-        delayed(_get_pooled_aggregate_stats_split)
+        delayed(get_pooled_aggregate_stats_split)
         (select_entities=evaluated_entities_arr[select_index].reshape((-1, )), 
         eval_entities=evaluated_entities_arr[eval_index].reshape((-1, )),
         dataset=dataset, 
@@ -65,7 +65,7 @@ def get_pooled_aggregate_stats(
         top_kr=top_kr,
         sliding_window=sliding_window, 
         use_all_ranks=use_all_ranks)
-        for eval_index, select_index in tqdm(kf.split(evaluated_entities_arr)))
+        for eval_index, select_index in tqdm(kf.split(evaluated_entities_arr), desc=f"Pooling Stats in {n_validation_splits} splits"))
 
     # Now aggregate the results of all the folds
     aggregate_stats = {}

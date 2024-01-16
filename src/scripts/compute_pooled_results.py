@@ -8,6 +8,7 @@
 # Script to evaluate model selection performance
 #######################################
 
+import json
 import os
 import pickle as pkl
 from sklearn.model_selection import ParameterGrid
@@ -101,12 +102,20 @@ def main(datasets=['smd', 'anomaly_archive']):
         stats = get_pooled_aggregate_stats(**params)
 
         if 'data_family' in params.keys():
-            aggregate_stats[params['data_family']] = stats
+            key = params['data_family']
         else:
-            aggregate_stats[params['dataset'].upper()] = stats
+            key = params['dataset'].upper()
 
-        with open(os.path.join(args['results_path'], f"aggregate_stats_{params['dataset']}.pkl"), 'wb') as f:
-            pkl.dump(aggregate_stats, f)
+        print(key, stats)
+        with open(os.path.join(args['results_path'], os.path.join(key, f"aggregate_stats.pkl")), 'wb') as f:
+            pkl.dump(stats, f)
+        # with open(os.path.join(args['results_path'], os.path.join(key, f"aggregate_stats.json")), 'w') as f:
+        #     json.dump(stats, f)
+
+        aggregate_stats[key] = stats
+
+    with open(os.path.join(args['results_path'], f"aggregate_stats.pkl"), 'wb') as f:
+        pkl.dump(aggregate_stats, f)
 
 
 if __name__ == '__main__':

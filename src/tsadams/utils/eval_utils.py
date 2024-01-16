@@ -28,7 +28,7 @@ def _valid_prediction_inputs(ranking_obj,
          (len(ranking_obj.synthetic_predictions.keys()) != n_models):
          VALID_MODELS = False
          if verbose:
-            print(f'Fewer than {n_models} models trained! Skipping...')
+            print(f'({ranking_obj.test_data.name}-{ranking_obj.test_data.entities[0].name}) Fewer than {n_models} models trained! Skipping...')
 
     model_names = list(ranking_obj.predictions.keys())
     for mn in model_names:
@@ -36,7 +36,7 @@ def _valid_prediction_inputs(ranking_obj,
             (len(ranking_obj.synthetic_predictions[mn].keys()) == n_synthetic_quantities):
             VALID_QUANTITIES = False
             if verbose:
-                print(f'Fewer than {n_quantities} quantities or {n_synthetic_quantities} synthetic quantities models trained! Skipping...')
+                print(f'({ranking_obj.test_data.name}-{ranking_obj.test_data.entities[0].name}) Fewer than {n_quantities} quantities or {n_synthetic_quantities} synthetic quantities models trained! Skipping...')
 
     VALID = VALID_MODELS and VALID_QUANTITIES
     
@@ -139,17 +139,17 @@ def evaluate_models_pooled(entities: List[str],
 # entities = ['machine-1-1', 'machine-1-2', 'machine-2-1', 'machine-2-2']
 # models_performance_matrix = evaluate_models_pooled(entities=entities, n_neighbors=[2, 4, 6], synthetic_ranking_criterion='f1', n_splits=100)
 
-def _get_pooled_aggregate_stats_split(select_entities, 
-                                      eval_entities, 
+def get_pooled_aggregate_stats_split(select_entities,
+                                      eval_entities,
                                       dataset,
-                                      save_dir, 
+                                      save_dir,
                                       n_neighbors,
-                                      n_splits, 
-                                      evaluation_metric, 
-                                      metric, 
-                                      top_k, 
-                                      top_kr, 
-                                      sliding_window, 
+                                      n_splits,
+                                      evaluation_metric,
+                                      metric,
+                                      top_k,
+                                      top_kr,
+                                      sliding_window,
                                       use_all_ranks):
     aggregate_stats = {}
     models_performance_matrix_select = evaluate_models_pooled(
@@ -159,7 +159,7 @@ def _get_pooled_aggregate_stats_split(select_entities,
         n_neighbors=n_neighbors,
         n_splits=n_splits,
         sliding_window=sliding_window)
-    
+
     models_performance_matrix_eval = evaluate_models_pooled(
         entities=eval_entities,
         dataset=dataset,
