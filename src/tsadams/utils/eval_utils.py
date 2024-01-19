@@ -69,7 +69,7 @@ def pool_predictions_of_entities(entities,
         for q in quantities_synthetic_predictions:
             synthetic_predictions[mn][q] = []
 
-    for entity in tqdm(entities):
+    for entity in tqdm(entities, desc=f"({dataset}) Pooling predictions"):
         ranking_obj_file = f'ranking_obj_{entity}.data'
 
         with open(os.path.join(save_dir, dataset, ranking_obj_file), 'rb') as f:
@@ -116,22 +116,27 @@ def evaluate_models_pooled(entities: List[str],
         entities=entities,
         save_dir=save_dir,
         dataset=dataset,
-        ignore_timesteps=ignore_timesteps)
+        ignore_timesteps=ignore_timesteps
+    )
 
     # Now use to predictions to rank the model
+    bar = tqdm(desc=f"({dataset}) Ranking pooled predictions", total=4)
     models_metrics = rank_by_metrics(predictions, n_splits=n_splits, sliding_window=sliding_window)
+    bar.update(1)
     models_forecasting_metrics = rank_by_forecasting_metrics(predictions)
-    models_centrality = rank_by_centrality(predictions,
-                                           n_neighbors=n_neighbors)
-    models_synthetic_anomlies = rank_by_synthetic_anomlies(
-        synthetic_predictions,
-        n_splits=n_splits)
+    bar.update(2)
+    models_centrality = rank_by_centrality(predictions, n_neighbors=n_neighbors)
+    bar.update(3)
+    models_synthetic_anomlies = rank_by_synthetic_anomlies(synthetic_predictions, n_splits=n_splits)
+    bar.update(4)
+    bar.close()
 
     models_performance_matrix = pd.concat([
         models_metrics, 
         models_forecasting_metrics, 
         models_centrality, 
-        models_synthetic_anomlies], axis=1)
+        models_synthetic_anomlies
+    ], axis=1)
 
     return models_performance_matrix
 
@@ -168,9 +173,7 @@ def get_pooled_aggregate_stats_split(select_entities,
         n_splits=n_splits,
         sliding_window=sliding_window)
 
-    ranks_by_metrics, *_ = rank_models(
-        models_performance_matrix_eval
-    )  # Rank Models based on the evaluation set
+    ranks_by_metrics, *_ = rank_models(models_performance_matrix_eval)  # Rank Models based on the evaluation set
 
     if evaluation_metric == 'Best F-1':
         ranks = np.concatenate(
@@ -185,16 +188,17 @@ def get_pooled_aggregate_stats_split(select_entities,
             [ranks_by_metrics[:8, :], ranks_by_metrics[10::3, :]],
             axis=0).astype(int)
 
-    performance_values = models_performance_matrix_eval.loc[:,
-                                                            evaluation_metric].to_numpy(
-                                                            ).squeeze()
+    performance_values = models_performance_matrix_eval.loc[:, evaluation_metric].to_numpy().squeeze()
 
     # Choose oracle based on selection set
     best_model_on_select_split = models_performance_matrix_select.index[
-        np.argmax(models_performance_matrix_select.loc[:, evaluation_metric])]
+        np.argmax(models_performance_matrix_select.loc[:, evaluation_metric])
+    ]
     # Evaluate it on the evaluation set
     aggregate_stats['Oracle No-MS'] = models_performance_matrix_eval.loc[
-        best_model_on_select_split, evaluation_metric]
+        best_model_on_select_split,
+        evaluation_metric
+    ]
 
     # Random Model Selection
     aggregate_stats['Random MS'] = np.mean(performance_values)
