@@ -20,8 +20,9 @@ ENTITIES = [AUTOTSAD_ENTITIES]
 ENTITIES = [['GutenTAG=ecg-diff-count-1.semi-supervised']]
 
 
-def main(datasets=DATASETS, entities=ENTITIES):
-    args = get_args_from_cmdline()
+def main(datasets=DATASETS, entities=ENTITIES, args=None):
+    if args is None:
+        args = get_args_from_cmdline()
 
     total_models = 0
     for d, dataset in enumerate(datasets):

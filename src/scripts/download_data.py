@@ -11,8 +11,9 @@
 from tsadams.datasets.load import load_data
 from tsadams.utils.utils import get_args_from_cmdline
 
-def main(datasets=['smd', 'anomaly_archive']):
-    args = get_args_from_cmdline()
+def main(datasets=['smd', 'anomaly_archive'], args=None):
+    if args is None:
+        args = get_args_from_cmdline()
 
     for d in datasets:
         _ = load_data(dataset=d,

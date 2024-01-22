@@ -179,8 +179,9 @@ def load_model_wrapper(dataset, entity, args, plot=False):
         plt.show()
 
 
-def main(datasets=['anomaly_archive', 'smd'], entities=[ANOMALY_ARCHIVE_ENTITIES, MACHINES]):
-    args = get_args_from_cmdline()
+def main(datasets=['anomaly_archive', 'smd'], entities=[ANOMALY_ARCHIVE_ENTITIES, MACHINES], args=None):
+    if args is None:
+        args = get_args_from_cmdline()
     
     set_all_seeds(args['random_seed']) # Reduce randomness
 

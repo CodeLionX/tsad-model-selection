@@ -81,8 +81,9 @@ def set_eval_params(args, datasets):
     return evaluation_params
 
 
-def main(datasets=['smd', 'anomaly_archive']):
-    args = get_args_from_cmdline()
+def main(datasets=['smd', 'anomaly_archive'], args=None):
+    if args is None:
+        args = get_args_from_cmdline()
    
     set_all_seeds(args['random_seed']) # Reduce randomness
 

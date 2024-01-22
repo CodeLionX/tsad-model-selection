@@ -358,12 +358,14 @@ def load_swat(**kwargs):
 def load_autotsad(group, datasets=None, downsampling=None, min_length=None, root_dir='./data', normalize=True, verbose=True):
     datasets_path = Path(root_dir) / "autotsad"
     if not datasets_path.exists():
+        datasets_path = datasets_path.parent
+    if not (datasets_path / "datasets.csv").exists():
         raise ValueError(f"AutoTSAD dataset not available, please put the data in the folder '{datasets_path}'!")
 
     df = pd.read_csv(datasets_path / "datasets.csv").set_index(["collection_name", "dataset_name"])
     # only use semi-supervised datasets!
     df = df[df["train_type"] == "semi-supervised"]
-    all_entities = [(c, d) for c, d in df.index.tolist()]
+    all_entities = [(c, d.split(".")[0]) for c, d in df.index.tolist()]
     all_entities = sorted(all_entities)
 
     if datasets is None: datasets = [f"{c}{AUTOTSAD_SEP}{d}" for c, d in all_entities]
@@ -376,8 +378,11 @@ def load_autotsad(group, datasets=None, downsampling=None, min_length=None, root
         if (collection, dataset) not in all_entities:
             raise ValueError(f"{entity} is not part of the semi-supervised AutoTSAD dataset!")
 
-        test_filepath = datasets_path / df.loc[(collection, dataset), "test_path"]
-        train_filepath = datasets_path / df.loc[(collection, dataset), "train_path"]
+        dataset_id = (collection, dataset)
+        if collection == "GutenTAG":
+            dataset_id = (collection, f"{dataset}.semi-supervised")
+        test_filepath = datasets_path / df.loc[dataset_id, "test_path"]
+        train_filepath = datasets_path / df.loc[dataset_id, "train_path"]
 
         # compute metadata
         with test_filepath.open("rb") as fh:

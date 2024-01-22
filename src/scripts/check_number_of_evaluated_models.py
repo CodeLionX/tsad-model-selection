@@ -16,8 +16,9 @@ from tsadams.utils.utils import get_args_from_cmdline
 DATASETS = ['autotsad']
 
 
-def main(datasets=DATASETS):
-    args = get_args_from_cmdline()
+def main(datasets=DATASETS, args=None):
+    if args is None:
+        args = get_args_from_cmdline()
 
     total_models = 0
     for d, dataset in enumerate(datasets):

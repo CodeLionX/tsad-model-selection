@@ -28,6 +28,9 @@ setup(
         "scipy==1.9.3",
         "setuptools==65.5.0",
         "statsmodels==0.13.5",
-        "tqdm==4.64.1"
+        "tqdm==4.64.1",
+        "pyyaml==6.0.1",
+        "requests==2.31.0",
+        "torch==2.1.0",
         ]
 )
