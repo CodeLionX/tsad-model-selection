@@ -1,3 +1,9 @@
+> [!IMPORTANT]
+> This is an adaption of the tsadams algorithm to integrate it within a different system.
+> Please consider the original implementation at https://github.com/mononitogoswami/tsad-model-selection.
+
+---
+
 <h1 align="center">Unsupervised Model Selection for Time-series Anomaly Detection</h1>
 <h3 align="center">Most time-series anomaly detection models don't need labels for training. So why should we need labels to select good models? </h3>
 
@@ -27,10 +33,11 @@ International Conference on Learning Representations (ICLR), 2023
 
 ## Contents
 
-1. [Datasets](#datasets)
-2. [Installation](#installation)
-3. [Reproduce Results](#reproduction)
-4. [Citation](#citation)
+- [Contents](#contents)
+- [Datasets](#datasets)
+- [Installation](#installation)
+- [Reproduce Results](#reproduce-results)
+- [Citation](#citation)
 
 <a id="datasets"></a>
 ## Datasets
@@ -72,29 +79,16 @@ To load the UCR dataset:
 <a id="installation"></a>
 ## Installation
 
-We recommend installing [Ananconda](https://conda.io/projects/conda/en/latest/index.html) to run our code. To install Anaconda, review the installation instructions [here](https://docs.anaconda.com/anaconda/install/). 
+> [!WARNING]
+> Installation using conda does not work. Please install using pip.
 
-To setup the environment using [`conda`](https://conda.io/projects/conda/en/latest/index.html) (recommended, but optional), run the following commands:
-
-```console
-    # To create environment from environment_explicit.yml file
-    foo@bar:~$ conda env create -f environment_explicit.yml
-    
-    # To activate the environment
-    foo@bar:~$ conda activate modelselect 
-    
-    # To verify if the new environment was installed correctly
-    foo@bar:~$ conda env list 
-
-```
-
-For an editable installation of our code from source, run the following commands:
+For an installation of our code from source, run the following commands:
 
 ```console
 
     foo@bar:~$ git clone https://github.com/mononitogoswami/tsad-model-selection.git
     foo@bar:~$ cd tsad-model-selection/src/
-    foo@bar:~$ pip install -e .
+    foo@bar:~$ pip install .
 
 ```
 ----
