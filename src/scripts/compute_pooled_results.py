@@ -107,10 +107,10 @@ def main(datasets=['smd', 'anomaly_archive']):
             key = params['dataset'].upper()
 
         print(key, stats)
-        with open(os.path.join(args['results_path'], os.path.join(key, f"aggregate_stats.pkl")), 'wb') as f:
+        with open(os.path.join(args['results_path'], f"{key}-aggregate_stats.pkl"), 'wb') as f:
             pkl.dump(stats, f)
-        # with open(os.path.join(args['results_path'], os.path.join(key, f"aggregate_stats.json")), 'w') as f:
-        #     json.dump(stats, f)
+        with open(os.path.join(args['results_path'], f"{key}-aggregate_stats.json"), 'w') as f:
+            json.dump(stats, f)
 
         aggregate_stats[key] = stats
 

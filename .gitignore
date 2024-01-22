@@ -1,6 +1,7 @@
 src/scripts/datasets
 src/scripts/results
 src/scripts/trained_models
+src/scripts/scorings
 
 # Pytorch models
 *.pt
