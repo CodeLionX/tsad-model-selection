@@ -36,8 +36,7 @@ def main(args: argparse.Namespace) -> None:
     # download_data(DATASETS, args=config)
     train_all_models(datasets, entities, args=config)
     evaluate_all_models(datasets, entities, args=config)
-    # performed within autotsad code:
-    # parse_ranking_results(DATASETS, ENTITIES, args=config)
+    parse_ranking_results(datasets, entities, args=config)
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ from tsadams.utils.utils import get_args_from_cmdline
 from tsadams.model_trainer.entities import ANOMALY_ARCHIVE_ENTITIES, MACHINES
 from tsadams.utils.set_all_seeds import set_all_seeds
 
+
 def set_eval_params(args):
     # Logger object to save the models
     logging_obj = Logger(save_dir=args['results_path'],
@@ -74,6 +75,7 @@ def evaluate_model_wrapper(dataset, entity, args):
                      obj_class=logging_hierarchy,
                      type='data')
 
+
 def main(datasets=['anomaly_archive', 'smd'], entities=[ANOMALY_ARCHIVE_ENTITIES, MACHINES], args=None):
     if args is None:
         args = get_args_from_cmdline()
@@ -84,6 +86,7 @@ def main(datasets=['anomaly_archive', 'smd'], entities=[ANOMALY_ARCHIVE_ENTITIES
         _ = Parallel(n_jobs=args['n_jobs'])(
             delayed(evaluate_model_wrapper)(dataset, entities, args)
             for entities in entities[d_i])
+
 
 if __name__ == '__main__':
     main()

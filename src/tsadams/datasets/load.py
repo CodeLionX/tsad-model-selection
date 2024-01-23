@@ -365,7 +365,7 @@ def load_autotsad(group, datasets=None, downsampling=None, min_length=None, root
     df = pd.read_csv(datasets_path / "datasets.csv").set_index(["collection_name", "dataset_name"])
     # only use semi-supervised datasets!
     df = df[df["train_type"] == "semi-supervised"]
-    all_entities = [(c, d.split(".")[0]) for c, d in df.index.tolist()]
+    all_entities = [(c, d) for c, d in df.index.tolist()]
     all_entities = sorted(all_entities)
 
     if datasets is None: datasets = [f"{c}{AUTOTSAD_SEP}{d}" for c, d in all_entities]
@@ -380,7 +380,7 @@ def load_autotsad(group, datasets=None, downsampling=None, min_length=None, root
 
         dataset_id = (collection, dataset)
         if collection == "GutenTAG":
-            dataset_id = (collection, f"{dataset}.semi-supervised")
+            dataset_id = (collection, dataset)
         test_filepath = datasets_path / df.loc[dataset_id, "test_path"]
         train_filepath = datasets_path / df.loc[dataset_id, "train_path"]
 

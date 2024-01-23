@@ -37,13 +37,14 @@ def _compute_aggregate_rank(performance_matrix: pd.DataFrame, use_all_ranks: boo
     # Evaluation metric should always be 'Best F-1'
     evaluation_metric = "Best F-1"
     metric_names = get_metric_names(performance_matrix.columns, evaluation_metric=evaluation_metric)
-    ranks = np.concatenate([ranks_by_metrics[:8, :], ranks_by_metrics[8::3, :]],axis=0).astype(int)
+    ranks = np.concatenate([ranks_by_metrics[:8, :], ranks_by_metrics[8::3, :]], axis=0).astype(int)
 
     if not use_all_ranks:
         filtered_idxs = [
             i for i, mn in enumerate(metric_names)
-            if ((len(mn.split('_')) == 3) and (mn.split(
-                '_')[2] in ['noise', 'scale', 'cutoff', 'contextual', 'average']))
+            if ((len(mn.split('_')) == 3) and (
+                mn.split('_')[2] in ['noise', 'scale', 'cutoff', 'contextual', 'average']
+            ))
         ]
         ranks = ranks[filtered_idxs, :]
 
@@ -68,7 +69,7 @@ def _plot_entity(entity: Entity, ax=None) -> None:
 
     if len(entity.Y.shape) == 1:
         data = entity.Y
-    if len(entity.Y.shape) == 2:
+    else:
         if entity.Y.shape[0] > 1:
             print(f"Can only plot univariate time series (shape={entity.shape})!")
             return
@@ -86,7 +87,7 @@ def _plot_entity(entity: Entity, ax=None) -> None:
         for b, e in anomalies:
             height = y1 - y0
             ax.add_patch(
-                Rectangle((b, y0), e-b, height, edgecolor="orange", facecolor="yellow", alpha=0.5)
+                Rectangle((b, y0), e - b, height, edgecolor="orange", facecolor="yellow", alpha=0.5)
             )
 
 
@@ -96,9 +97,16 @@ def load_model_wrapper(dataset, entity, args, plot=False):
     print(f"Loading results for dataset {dataset} on entity: {entity}")
     print(42 * "=")
 
-    ro_path = Path(args["results_path"]) / dataset / f"ranking_obj_{entity}.data"
+    results_path = Path(args["results_path"]) / dataset
+    results_path.mkdir(exist_ok=True)
+    ro_path = results_path / f"ranking_obj_{entity}.data"
+    scores_path = results_path / f"scores_{entity}.csv"
     if not ro_path.exists():
         print(f"No results for {entity} found!")
+        return
+
+    if not args['overwrite'] and scores_path.exists():
+        print(f"Ranking results for entity {entity} already processed; scores exist!")
         return
 
     with ro_path.open('rb') as f:
@@ -106,13 +114,7 @@ def load_model_wrapper(dataset, entity, args, plot=False):
     
     entity_name = ranking_obj.test_data.entities[0].name
 
-    autotsad_result_path = Path("scorings") / f"tsadams-{entity_name}-mim"
-    autotsad_result_path.mkdir(exist_ok=True)
-    scorings_path = autotsad_result_path / f"scores.csv"
-    with (autotsad_result_path / "config.json").open("w") as fh:
-        json.dump(args, fh)
-
-    with (autotsad_result_path / "execution.log").open("w") as fh, redirect_stdout(fh):
+    with (results_path / f"execution_{entity}.log").open("w") as fh, redirect_stdout(fh):
         print(ranking_obj.test_data)
         print(f"Entity-name={entity_name}")
 
@@ -141,8 +143,9 @@ def load_model_wrapper(dataset, entity, args, plot=False):
                 print("models_synthetic_anomlies is missing!")
 
             if len(metrics) == 0:
-                np.savetxt(scorings_path, np.zeros(ranking_obj.test_data.entities[0].Y.shape[1]), delimiter=",")
-                print(f"\n{dataset} {entity}: Could not load ranking results because the performance matrix is missing completely!")
+                np.savetxt(scores_path, np.zeros(ranking_obj.test_data.entities[0].Y.shape[1]), delimiter=",")
+                print(f"\n{dataset} {entity}: Could not load ranking results because the performance matrix "
+                      "is missing completely!")
                 print("==========================================")
                 return
 
@@ -156,16 +159,16 @@ def load_model_wrapper(dataset, entity, args, plot=False):
                 continue
             scoring = ranking_obj.predictions[m]['entity_scores']
             print(f"  {m} found scorings (shape ={scoring.shape})")
-            # for univariate TS (autotsad), we can do scoring.ravel()
-            # print(scoring)
+
         best_method = _compute_aggregate_rank(ranking_obj.models_performance_matrix,
-                                            use_all_ranks=args["use_all_ranks"],
-                                            metric=args["metric"],
-                                            top_k=args["top_k"],
-                                            top_kr=args["top_kr"])
+                                              use_all_ranks=args["use_all_ranks"],
+                                              metric=args["metric"],
+                                              top_k=args["top_k"],
+                                              top_kr=args["top_kr"])
         print(f"Best method for dataset {ranking_obj.test_data.entities[0].name}: {best_method}")
+        # for univariate TS (autotsad), we can do scoring.ravel()
         scoring = ranking_obj.predictions[best_method]['entity_scores'].ravel()
-        np.savetxt(scorings_path, scoring, delimiter=",")
+        np.savetxt(scores_path, scoring, delimiter=",")
 
     if plot:
         fig, axs = plt.subplots(2, 2, sharex="col")
@@ -184,9 +187,6 @@ def main(datasets=['anomaly_archive', 'smd'], entities=[ANOMALY_ARCHIVE_ENTITIES
         args = get_args_from_cmdline()
     
     set_all_seeds(args['random_seed']) # Reduce randomness
-
-    scorings_path = Path("scorings")
-    scorings_path.mkdir(exist_ok=True)
 
     for d_i, dataset in enumerate(datasets):
         _ = Parallel(n_jobs=args['n_jobs'])(
