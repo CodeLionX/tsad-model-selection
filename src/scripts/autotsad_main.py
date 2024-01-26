@@ -27,6 +27,9 @@ def create_parser() -> argparse.ArgumentParser:
 
 
 def main(args: argparse.Namespace) -> None:
+    if args.dataset == 'autotsad' and args.entity not in AUTOTSAD_ENTITIES:
+        raise ValueError(f"Entity {args.entity} is not supported for dataset {args.dataset}")
+
     datasets = [args.dataset]
     entities = [[args.entity]]
 
