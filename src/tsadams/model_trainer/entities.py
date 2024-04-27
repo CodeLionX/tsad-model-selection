@@ -231,16 +231,26 @@ SMAP_CHANNELS = [
 # Entities in the AutoTSAD Dataset
 #######################################
 AUTOTSAD_ENTITIES = [
-    "GutenTAG=ecg-diff-count-1.semi-supervised", "GutenTAG=ecg-same-count-1.semi-supervised", "GutenTAG=ecg-type-mean.semi-supervised",
-    "GutenTAG=ecg-type-pattern-shift.semi-supervised", "GutenTAG=poly-diff-count-5.semi-supervised", "GutenTAG=poly-length-500.semi-supervised",
-    "GutenTAG=rw-combined-diff-2.semi-supervised", "GutenTAG=rw-length-100.semi-supervised", "GutenTAG=sinus-position-middle.semi-supervised",
-    "GutenTAG=sinus-type-mean.semi-supervised", "KDD-TSAD=022_UCR_Anomaly_DISTORTEDGP711MarkerLFM5z4", "KDD-TSAD=030_UCR_Anomaly_DISTORTEDInternalBleeding19",
-    "KDD-TSAD=070_UCR_Anomaly_DISTORTEDltstdbs30791AI", "KDD-TSAD=102_UCR_Anomaly_NOISEMesoplodonDensirostris","KDD-TSAD=114_UCR_Anomaly_CIMIS44AirTemperature2",
-    "KDD-TSAD=152_UCR_Anomaly_PowerDemand1", "KDD-TSAD=163_UCR_Anomaly_apneaecg2", "KDD-TSAD=174_UCR_Anomaly_insectEPG2",
-    "KDD-TSAD=202_UCR_Anomaly_CHARISfive", "KDD-TSAD=208_UCR_Anomaly_CHARISten", "NASA-MSL=C-2", "NASA-MSL=D-14", "NASA-MSL=F-5",
-    "NASA-MSL=M-6", "NASA-MSL=M-7", "NASA-MSL=P-14", "NASA-MSL=P-15", "NASA-MSL=T-12", "NASA-MSL=T-5", "NASA-MSL=T-8", "NASA-SMAP=A-1",
-    "NASA-SMAP=D-13", "NASA-SMAP=D-5", "NASA-SMAP=E-1", "NASA-SMAP=E-5", "NASA-SMAP=E-7", "NASA-SMAP=G-3", "NASA-SMAP=G-4", "NASA-SMAP=P-4",
-    "NASA-SMAP=S-1"
+    "GutenTAG=cbf-position-middle.semi-supervised", "GutenTAG=ecg-diff-count-1.semi-supervised", "GutenTAG=ecg-diff-count-8.semi-supervised",
+    "GutenTAG=ecg-same-count-1.semi-supervised", "GutenTAG=ecg-same-count-2.semi-supervised", "GutenTAG=ecg-type-mean.semi-supervised",
+    "GutenTAG=ecg-type-pattern-shift.semi-supervised", "GutenTAG=ecg-type-trend.semi-supervised", "GutenTAG=poly-diff-count-2.semi-supervised",
+    "GutenTAG=poly-diff-count-5.semi-supervised", "GutenTAG=poly-length-10.semi-supervised", "GutenTAG=poly-length-500.semi-supervised",
+    "GutenTAG=poly-trend-linear.semi-supervised", "GutenTAG=rw-combined-diff-1.semi-supervised", "GutenTAG=rw-combined-diff-2.semi-supervised",
+    "GutenTAG=rw-length-100.semi-supervised", "GutenTAG=sinus-diff-count-2.semi-supervised", "GutenTAG=sinus-length-50.semi-supervised",
+    "GutenTAG=sinus-position-middle.semi-supervised", "GutenTAG=sinus-type-mean.semi-supervised", "KDD-TSAD=011_UCR_Anomaly_DISTORTEDECG1",
+    "KDD-TSAD=022_UCR_Anomaly_DISTORTEDGP711MarkerLFM5z4", "KDD-TSAD=030_UCR_Anomaly_DISTORTEDInternalBleeding19",
+    "KDD-TSAD=031_UCR_Anomaly_DISTORTEDInternalBleeding20", "KDD-TSAD=058_UCR_Anomaly_DISTORTEDapneaecg",
+    "KDD-TSAD=070_UCR_Anomaly_DISTORTEDltstdbs30791AI", "KDD-TSAD=074_UCR_Anomaly_DISTORTEDqtdbSel1005V",
+    "KDD-TSAD=095_UCR_Anomaly_NOISECIMIS44AirTemperature4", "KDD-TSAD=098_UCR_Anomaly_NOISEInternalBleeding16",
+    "KDD-TSAD=102_UCR_Anomaly_NOISEMesoplodonDensirostris", "KDD-TSAD=114_UCR_Anomaly_CIMIS44AirTemperature2",
+    "KDD-TSAD=131_UCR_Anomaly_GP711MarkerLFM5z5", "KDD-TSAD=147_UCR_Anomaly_Lab2Cmac011215EPG3", "KDD-TSAD=152_UCR_Anomaly_PowerDemand1",
+    "KDD-TSAD=154_UCR_Anomaly_PowerDemand3", "KDD-TSAD=163_UCR_Anomaly_apneaecg2", "KDD-TSAD=174_UCR_Anomaly_insectEPG2",
+    "KDD-TSAD=202_UCR_Anomaly_CHARISfive", "KDD-TSAD=208_UCR_Anomaly_CHARISten", "KDD-TSAD=232_UCR_Anomaly_mit14134longtermecg",
+    "NASA-MSL=C-2", "NASA-MSL=D-14", "NASA-MSL=F-5", "NASA-MSL=F-7", "NASA-MSL=M-6", "NASA-MSL=M-7", "NASA-MSL=P-10",
+    "NASA-MSL=P-11", "NASA-MSL=P-14", "NASA-MSL=P-15", "NASA-MSL=S-2", "NASA-MSL=T-12", "NASA-MSL=T-4", "NASA-MSL=T-5",
+    "NASA-MSL=T-8", "NASA-SMAP=A-1", "NASA-SMAP=A-2", "NASA-SMAP=A-3", "NASA-SMAP=A-5", "NASA-SMAP=B-1", "NASA-SMAP=D-13",
+    "NASA-SMAP=D-5", "NASA-SMAP=D-8", "NASA-SMAP=E-1", "NASA-SMAP=E-5", "NASA-SMAP=E-6", "NASA-SMAP=E-7", "NASA-SMAP=G-1",
+    "NASA-SMAP=G-2", "NASA-SMAP=G-3", "NASA-SMAP=G-4", "NASA-SMAP=G-6", "NASA-SMAP=G-7", "NASA-SMAP=P-4", "NASA-SMAP=S-1"
 ]
 
 #######################################
