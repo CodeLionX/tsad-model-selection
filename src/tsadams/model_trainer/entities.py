@@ -250,7 +250,8 @@ AUTOTSAD_ENTITIES = [
     "NASA-MSL=P-11", "NASA-MSL=P-14", "NASA-MSL=P-15", "NASA-MSL=S-2", "NASA-MSL=T-12", "NASA-MSL=T-4", "NASA-MSL=T-5",
     "NASA-MSL=T-8", "NASA-SMAP=A-1", "NASA-SMAP=A-2", "NASA-SMAP=A-3", "NASA-SMAP=A-5", "NASA-SMAP=B-1", "NASA-SMAP=D-13",
     "NASA-SMAP=D-5", "NASA-SMAP=D-8", "NASA-SMAP=E-1", "NASA-SMAP=E-5", "NASA-SMAP=E-6", "NASA-SMAP=E-7", "NASA-SMAP=G-1",
-    "NASA-SMAP=G-2", "NASA-SMAP=G-3", "NASA-SMAP=G-4", "NASA-SMAP=G-6", "NASA-SMAP=G-7", "NASA-SMAP=P-4", "NASA-SMAP=S-1"
+    "NASA-SMAP=G-2", "NASA-SMAP=G-3", "NASA-SMAP=G-4", "NASA-SMAP=G-6", "NASA-SMAP=G-7", "NASA-SMAP=P-4", "NASA-SMAP=S-1",
+    "synthetic=gt-0.csv", "synthetic=gt-2.csv", "synthetic=gt-3.csv", "synthetic=gt-4.csv",
 ]
 
 #######################################
